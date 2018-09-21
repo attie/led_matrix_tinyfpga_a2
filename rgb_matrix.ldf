@@ -12,6 +12,12 @@
         <Source name="timeout.v" type="Verilog" type_short="Verilog">
             <Options/>
         </Source>
+        <Source name="matrix_scan.v" type="Verilog" type_short="Verilog">
+            <Options/>
+        </Source>
+        <Source name="rainbow_generator.v" type="Verilog" type_short="Verilog">
+            <Options/>
+        </Source>
         <Source name="rgb_matrix.lpf" type="Logic Preference" type_short="LPF">
             <Options/>
         </Source>
