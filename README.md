@@ -116,3 +116,29 @@ As shown below, you _must_ be careful of a few transitions:
   - It's fine to clock new data in while the output is still active
 
 ![full scan waveform](doc/full_scan.svg)
+
+### Brightness Control
+
+As we aren't able to address pixels individually, and the drivers don't provide any brightness control (just on/off), we must control the output enable ourselves.
+
+The best way to do this is by displaying one bit of the sub-pixel's brightness at a time.
+
+  - I'm aiming at RGB565, therefore I _need_ 6-bit brightness control
+  - Vary the `#Output_Enable` width
+  - Use a rolling single-bit mask, and multiple row shifts to use the correct brightness
+
+The width of `#Output_Enable` needs to be related to the current bit's value...
+
+  - Mask of `6'b000001` has a width of 1&times;
+  - `6'b000010` &rarr; 2&times;
+  - `6'b000100` &rarr; 4&times;
+  - `6'b001000` &rarr; 8&times;
+  - `6'b010000` &rarr; 16&times;
+  - `6'b100000` &rarr; 32&times;
+
+The apparent brightness of LEDs does not correlate linearly with average current (i.e: on-time).
+For low values the brightness rapidly increases, while for high values the brightness appears to barely change.
+To address this, we can apply [Gamma correction](https://en.wikipedia.org/wiki/Gamma_correction).
+I'm wondering if we can do something about that here, with the variable width control of `#Output_Enable`... but brief attempts and mental reasoning are hinting at "_no_"... any thoughts? :-)
+
+![brightness waveform](doc/brightness.svg)

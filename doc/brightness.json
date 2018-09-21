@@ -1,0 +1,8 @@
+{signal: [
+  {name: 'clk',      wave: '0x.0...x.0.....x.0..........', period: 0.5},
+  {name: 'rgb',      wave: '0x.0...x.0.....x.0..........', period: 0.5},
+  {name: 'latch',    wave: '0..10....10......10.........', period: 0.5},
+  {name: '#oe',      wave: '1....0.1...0...1...0.......1', period: 0.5},
+  {name: 'notes',    wave: 'x....2.x...2...x...2.......x', period: 0.5, data: ['1ms', '2ms', '4ms']},
+]
+}
