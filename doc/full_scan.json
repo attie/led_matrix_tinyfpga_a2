@@ -1,8 +1,6 @@
 {signal: [
   {name: 'clk',      wave: '0x.0..x.0..x.0..|x.0..x.0..x.0.', period: 0.5},
-  {name: 'red',      wave: '0x.0..x.0..x.0..|x.0..x.0..x.0.', period: 0.5},
-  {name: 'green',    wave: '0x.0..x.0..x.0..|x.0..x.0..x.0.', period: 0.5},
-  {name: 'blue',     wave: '0x.0..x.0..x.0..|x.0..x.0..x.0.', period: 0.5},
+  {name: 'rgb',      wave: '0x.0..x.0..x.0..|x.0..x.0..x.0.', period: 0.5},
   {name: 'latch',    wave: '0..10...10...10.|..10...10...10', period: 0.5},
   {name: '#oe',      wave: '1....0.1..0.1..0|.1..0.1..0.1..', period: 0.5},
   {name: 'row[3:0]', wave: 'x...2...x2...x2.|..x2...x2...x2', period: 0.5, data: ['0','1','13','14','15']}
