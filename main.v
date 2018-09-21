@@ -181,23 +181,23 @@ module main (
 	assign debug = 1'b0;
 
 	/* assign signals to pins */
-	assign pin1 = debug;
-	assign pin2 = ~output_enable;
-	assign pin3 = row_address[0];
-	assign pin4 = row_address[1];
-	assign pin5 = row_address[2];
-	assign pin6 = row_address[3];
-	assign pin7 = 1'bz;
-	assign pin8 = 1'bz;
-	assign pin9 = 1'bz;
-	assign pin10 = clk_root && pixel_clk_en;
-	assign pin11 = clk_root && row_latch_en;
+	/* Debug LED  */ assign pin1 = debug;
+	/* #OE        */ assign pin2 = ~output_enable;
+	/* A / Row[0] */ assign pin3 = row_address[0];
+	/* B / Row[1] */ assign pin4 = row_address[1];
+	/* C / Row[2] */ assign pin5 = row_address[2];
+	/* D / Row[3] */ assign pin6 = row_address[3];
+	/*            */ assign pin7 = 1'bz;
+	/*            */ assign pin8 = 1'bz;
+	/*            */ assign pin9 = 1'bz;
+	/* Pixel Clk  */ assign pin10 = clk_root && pixel_clk_en;
+	/* Row Latch  */ assign pin11 = clk_root && row_latch_en;
 	// 12, 13, 14, 15 ==> JTAG
-	assign pin16 = rgb1[0];
-	assign pin17 = rgb1[1];
-	assign pin18 = rgb1[2];
-	assign pin19 = rgb2[0];
-	assign pin20 = rgb2[1];
-	assign pin21 = rgb2[2];
-	assign pin22 = 1'bz;
+	/* Red   1    */ assign pin16 = rgb1[0];
+	/* Green 1    */ assign pin17 = rgb1[1];
+	/* Blue  1    */ assign pin18 = rgb1[2];
+	/* Red   2    */ assign pin19 = rgb2[0];
+	/* Green 2    */ assign pin20 = rgb2[1];
+	/* Blue  2    */ assign pin21 = rgb2[2];
+	/*            */ assign pin22 = 1'bz;
 endmodule
