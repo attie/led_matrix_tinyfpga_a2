@@ -1,1 +1,0 @@
-Produces a red -> green -> blue -> red color gradient
