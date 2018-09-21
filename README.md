@@ -142,3 +142,5 @@ To address this, we can apply [Gamma correction](https://en.wikipedia.org/wiki/G
 I'm wondering if we can do something about that here, with the variable width control of `#Output_Enable`... but brief attempts and mental reasoning are hinting at "_no_"... any thoughts? :-)
 
 ![brightness waveform](doc/brightness.svg)
+
+To reduce off-time (i.e: make the display brighter), you can start clocking the next bit out during the on-time of the previous bit.
