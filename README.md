@@ -1,6 +1,6 @@
 # RGB Matrix
 
-This project aims to run a 64 &times; 32 RGB LED matrix from a [TinyFPGA AX2](https://store.tinyfpga.com/products/tinyfpga-a2).
+This project aims to run a 64 &times; 32 RGB LED matrix from a [TinyFPGA AX2](https://store.tinyfpga.com/products/tinyfpga-a2), with two full RGB565 framebuffers (double buffering), and a UART interface.
 
 ## Get a Matrix
 
