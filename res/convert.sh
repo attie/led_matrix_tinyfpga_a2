@@ -24,6 +24,7 @@ OUTPUT_BASE="${INPUT%%.*}"
 gst-launch-1.0 -v \
 	filesrc "location=${INPUT}" \
 	! decodebin \
+	! gamma gamma=0.6 \
 	! videoconvert \
 	! video/x-raw,format=RGB16,width=64,height=32,framerate=0/1 \
 	! filesink "location=${OUTPUT_BASE}.bin"
