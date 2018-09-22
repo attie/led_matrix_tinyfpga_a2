@@ -1,7 +1,7 @@
 module control_module #(
 	/* UART configuration */
-	parameter UART_CLK_DIV_COUNT = 30, /* 7 MHz in / 30 = ~115,200 baud (actually ~116,686 baud, +1.29%) */
-	parameter UART_CLK_DIV_WIDTH = 5
+	parameter UART_CLK_DIV_COUNT = 231, /* 53.2 MHz in / 231 = ~115,200 baud (actually ~115,151 baud, -0.04%) */
+	parameter UART_CLK_DIV_WIDTH = 8
 ) (
 	input reset,
 	input clk_in,
