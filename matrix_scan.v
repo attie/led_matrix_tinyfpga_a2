@@ -2,7 +2,7 @@ module matrix_scan (
 	input reset,
 	input clk_in,
 
-	output [7:0] column_address,  /* the current column */
+	output [5:0] column_address,  /* the current column */
 	output reg [3:0] row_address, /* the current row */
 
 	output clk_pixel,
@@ -35,11 +35,13 @@ module matrix_scan (
 
 	/* produces the pixel clock enable signal
 	   there are 64 pixels per row, this starts immediately after a state advance */
-	timeout timeout_clk_pixel_en (
+	timeout #(
+		.COUNTER_WIDTH(7)
+	) timeout_clk_pixel_en (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(clk_state),
-		.value(8'd64),
+		.value(7'd64),
 		.counter(),
 		.running(clk_pixel_en)
 	);
@@ -47,11 +49,13 @@ module matrix_scan (
 	/* produce the column address
 	   counts from 63 -> 0 and then stops
 	   advances out-of-phase with the pixel clock */ 
-	timeout timeout_column_address (
+	timeout #(
+		.COUNTER_WIDTH(6)
+	) timeout_column_address (
 		.reset(reset),
 		.clk_in(~clk_in),
 		.start(clk_state),
-		.value(8'd63),
+		.value(6'd63),
 		.counter(column_address),
 		.running()
 	);

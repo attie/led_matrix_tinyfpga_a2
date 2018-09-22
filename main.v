@@ -30,7 +30,7 @@ module main (
 
 	wire uart_rx;
 
-	wire [7:0] column_address;
+	wire [5:0] column_address;
 	wire [3:0] row_address;
 	wire [5:0] brightness_mask;
 
