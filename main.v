@@ -32,6 +32,7 @@ module main (
 
 	wire [5:0] column_address;
 	wire [3:0] row_address;
+	wire [3:0] row_address_active;
 	wire [5:0] brightness_mask;
 
 	wire [5:0] rgb_red;
@@ -66,6 +67,7 @@ module main (
 		.clk_in(clk_root),
 		.column_address(column_address),
 		.row_address(row_address),
+		.row_address_active(row_address_active),
 		.clk_pixel(clk_pixel),
 		.row_latch(row_latch),
 		.output_enable(output_enable),
@@ -103,10 +105,10 @@ module main (
 	/* assign signals to pins */
 	/* Debug LED  */ assign pin1 = debug;
 	/* #OE        */ assign pin2 = ~output_enable;
-	/* A / Row[0] */ assign pin3 = row_address[0];
-	/* B / Row[1] */ assign pin4 = row_address[1];
-	/* C / Row[2] */ assign pin5 = row_address[2];
-	/* D / Row[3] */ assign pin6 = row_address[3];
+	/* A / Row[0] */ assign pin3 = row_address_active[0];
+	/* B / Row[1] */ assign pin4 = row_address_active[1];
+	/* C / Row[2] */ assign pin5 = row_address_active[2];
+	/* D / Row[3] */ assign pin6 = row_address_active[3];
 	/* Uart Rx    */ assign pin7 = 1'bz; assign uart_rx = pin7;
 	/*            */ assign pin8 = 1'bz;
 	/*            */ assign pin9 = 1'bz;

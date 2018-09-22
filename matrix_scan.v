@@ -2,8 +2,9 @@ module matrix_scan (
 	input reset,
 	input clk_in,
 
-	output [5:0] column_address,  /* the current column */
-	output reg [3:0] row_address, /* the current row */
+	output [5:0] column_address,         /* the current column (clocking out now) */
+	output reg [3:0] row_address,        /* the current row (clocking out now) */
+	output reg [3:0] row_address_active, /* the active row (LEDs enabled) */
 
 	output clk_pixel,
 	output row_latch,
@@ -17,8 +18,8 @@ module matrix_scan (
 	wire row_latch_delay; /* delays the row_latch timeout */
 	wire row_latch_en;    /* enables the row latch */
 
-	reg  [5:0] brightness_mask_prev; /* used to control the timeout once the state has advanced */
-	wire [7:0] brightness_timeout;   /* used to time the output enable period */
+	reg  [5:0] brightness_mask_active; /* the active mask value (LEDs enabled)... from before the state advanced */
+	wire [7:0] brightness_timeout;     /* used to time the output enable period */
 
 	assign clk_pixel = clk_in && clk_pixel_en;
 	assign row_latch = clk_in && row_latch_en;
@@ -85,16 +86,16 @@ module matrix_scan (
 
 	/* decide how long to enable the LEDs for... we probably need some gamma correction here */
 	assign brightness_timeout = 
-		(brightness_mask_prev == 6'b000001) ? 8'd1 :
-		(brightness_mask_prev == 6'b000010) ? 8'd2 :
-		(brightness_mask_prev == 6'b000100) ? 8'd4 :
-		(brightness_mask_prev == 6'b001000) ? 8'd8 :
-		(brightness_mask_prev == 6'b010000) ? 8'd16 :
-		(brightness_mask_prev == 6'b100000) ? 8'd32 :
+		(brightness_mask_active == 6'b000001) ? 8'd1 :
+		(brightness_mask_active == 6'b000010) ? 8'd2 :
+		(brightness_mask_active == 6'b000100) ? 8'd4 :
+		(brightness_mask_active == 6'b001000) ? 8'd8 :
+		(brightness_mask_active == 6'b010000) ? 8'd16 :
+		(brightness_mask_active == 6'b100000) ? 8'd32 :
 		8'd0;
 
 	/* produces the variable-width output enable signal
-	   this signal is controlled by the rolling brightness_mask_prev signal (brightness_mask has advanced already)
+	   this signal is controlled by the rolling brightness_mask_active signal (brightness_mask has advanced already)
 	   the wider the output_enable pulse, the brighter the LEDs */
 	timeout timeout_output_enable (
 		.reset(reset),
@@ -106,20 +107,17 @@ module matrix_scan (
 	);
 
 	/* on completion of the row_latch_delay, we advanced the brightness mask to generate the next row of pixels */
-	always @(negedge row_latch_delay) begin
-		brightness_mask_prev <= brightness_mask;
+	always @(posedge row_latch_en) begin
+		brightness_mask_active <= brightness_mask;
+		row_address_active <= row_address;
 
-		if (brightness_mask == 6'd0) begin
+		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b100000)) begin
 			/* catch the initial value / oopsy */
 			brightness_mask <= 6'b1;
+			row_address <= row_address + 4'd1;
 		end
 		else begin
-			brightness_mask <= { brightness_mask[4:0], brightness_mask[5] };
+			brightness_mask <= brightness_mask << 1;
 		end
-	end
-
-	/* once the brightness_mask has progressed through the brightest pixel, step the row_address on one */
-	always @(negedge brightness_mask_prev[5]) begin
-		row_address <= row_address + 4'd1;
 	end
 endmodule
