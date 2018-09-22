@@ -68,6 +68,7 @@ module main (
 		.column_address(column_address),
 		.row_address(row_address),
 		.row_address_active(row_address_active),
+		.clk_pixel_load(),
 		.clk_pixel(clk_pixel),
 		.row_latch(row_latch),
 		.output_enable(output_enable),

@@ -6,6 +6,7 @@ module matrix_scan (
 	output reg [3:0] row_address,        /* the current row (clocking out now) */
 	output reg [3:0] row_address_active, /* the active row (LEDs enabled) */
 
+	output clk_pixel_load,
 	output clk_pixel,
 	output row_latch,
 	output output_enable,
@@ -14,13 +15,15 @@ module matrix_scan (
 );
 	wire clk_state;
 
-	wire clk_pixel_en;    /* enables the pixel clock */
+	wire clk_pixel_load_en;/* enables the pixel load clock */
+	reg  clk_pixel_en;    /* enables the pixel clock, delayed by one cycle from the load clock */
 	wire row_latch_delay; /* delays the row_latch timeout */
 	wire row_latch_en;    /* enables the row latch */
 
 	reg  [5:0] brightness_mask_active; /* the active mask value (LEDs enabled)... from before the state advanced */
 	wire [7:0] brightness_timeout;     /* used to time the output enable period */
 
+	assign clk_pixel_load = clk_in && clk_pixel_load_en;
 	assign clk_pixel = clk_in && clk_pixel_en;
 	assign row_latch = clk_in && row_latch_en;
 
@@ -34,17 +37,17 @@ module matrix_scan (
 		.clk_out(clk_state)
 	);
 
-	/* produces the pixel clock enable signal
-	   there are 64 pixels per row, this starts immediately after a state advance */
+	/* produce 64 load clocks per line...
+	   external logic should present the pixel value on the rising edge */
 	timeout #(
 		.COUNTER_WIDTH(7)
-	) timeout_clk_pixel_en (
+	) timeout_clk_pixel_load_en (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(clk_state),
 		.value(7'd64),
 		.counter(),
-		.running(clk_pixel_en)
+		.running(clk_pixel_load_en)
 	);
 
 	/* produce the column address
@@ -54,19 +57,25 @@ module matrix_scan (
 		.COUNTER_WIDTH(6)
 	) timeout_column_address (
 		.reset(reset),
-		.clk_in(~clk_in),
+		.clk_in(clk_in),
 		.start(clk_state),
 		.value(6'd63),
 		.counter(column_address),
 		.running()
 	);
 
+	/* produces the pixel clock enable signal
+	   there are 64 pixels per row, this starts immediately after a state advance */
+	always @(posedge clk_in) begin
+		clk_pixel_en <= clk_pixel_load_en;
+	end
+
 	/* delays the row latch enable
 	   after 63x pixel clocks, we let the latch enable timeout run */
 	timeout timeout_row_latch_delay (
 		.reset(reset),
 		.clk_in(clk_in),
-		.start(clk_state),
+		.start(clk_pixel_load_en),
 		.value(8'd63),
 		.counter(),
 		.running(row_latch_delay)
