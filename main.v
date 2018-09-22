@@ -21,6 +21,8 @@ module main (
 );
 	wire debug;
 
+	wire global_reset;
+
 	wire clk_root;
 	wire clk_pixel;
 
@@ -46,7 +48,6 @@ module main (
 	);
 
 	/* produces a global reset */
-	wire global_reset;
 	timeout timeout_global_reset (
 		.reset(1'b0),
 		.clk_in(clk_root),
