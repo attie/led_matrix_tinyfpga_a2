@@ -4,3 +4,5 @@
 /*_tcr.dir/
 /promote.xml
 /reportview.xml
+/res/*.bin
+/res/*.mem
