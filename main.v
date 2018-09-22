@@ -28,6 +28,8 @@ module main (
 
 	wire row_latch;
 
+	wire uart_rx;
+
 	wire [7:0] column_address;
 	wire [3:0] row_address;
 	wire [5:0] brightness_mask;
@@ -36,6 +38,7 @@ module main (
 	wire [5:0] rgb_green;
 	wire [5:0] rgb_blue;
 
+	wire [2:0] rgb_enable;
 	wire [2:0] rgb1; /* the current RGB value for the top-half of the display */
 	wire [2:0] rgb2; /* the current RGB value for the bottom-half of the display */
 
@@ -77,10 +80,21 @@ module main (
 		.blue(rgb_blue)
 	);
 
+	/* the control module */
+	control_module ctrl (
+		.reset(global_reset),
+		.clk_in(clk_root),
+		.uart_rx(uart_rx),
+		.enable_red(rgb_enable[0]),
+		.enable_green(rgb_enable[1]),
+		.enable_blue(rgb_enable[2]),
+		.rx_running(rx_running)
+	);
+
 	/* apply the brightness mask to the calculated sub-pixel value */
-	assign rgb1[0] = ((rgb_red   & brightness_mask) != 0);
-	assign rgb1[1] = ((rgb_green & brightness_mask) != 0);
-	assign rgb1[2] = ((rgb_blue  & brightness_mask) != 0);
+	assign rgb1[0] = ((rgb_red   & brightness_mask) != 0) && rgb_enable[0];
+	assign rgb1[1] = ((rgb_green & brightness_mask) != 0) && rgb_enable[1];
+	assign rgb1[2] = ((rgb_blue  & brightness_mask) != 0) && rgb_enable[2];
 	assign rgb2 = rgb1; /* mirror top/bottom */
 
 	/* use this signal for insight! */
@@ -93,7 +107,7 @@ module main (
 	/* B / Row[1] */ assign pin4 = row_address[1];
 	/* C / Row[2] */ assign pin5 = row_address[2];
 	/* D / Row[3] */ assign pin6 = row_address[3];
-	/*            */ assign pin7 = 1'bz;
+	/* Uart Rx    */ assign pin7 = 1'bz; assign uart_rx = pin7;
 	/*            */ assign pin8 = 1'bz;
 	/*            */ assign pin9 = 1'bz;
 	/* Pixel Clk  */ assign pin10 = clk_pixel;
