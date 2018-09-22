@@ -27,7 +27,7 @@ module matrix_scan (
 	/* produces the state-advance clock
 	   states produce brighter and brighter pixels before advancing to the next row */
 	clock_divider #(
-		.CLK_DIV_COUNT('d33) /* 33 * 2 = 66... each row takes 64 pixels, +1 latch = 65 clock cycles */
+		.CLK_DIV_COUNT(33) /* 33 * 2 = 66... each row takes 64 pixels, +1 latch = 65 clock cycles */
 	) clkdiv_state (
 		.reset(reset),
 		.clk_in(clk_in),
