@@ -92,9 +92,9 @@ module main (
 	);
 
 	/* apply the brightness mask to the calculated sub-pixel value */
-	assign rgb1[0] = ((rgb_red   & brightness_mask) != 0) && rgb_enable[0];
-	assign rgb1[1] = ((rgb_green & brightness_mask) != 0) && rgb_enable[1];
-	assign rgb1[2] = ((rgb_blue  & brightness_mask) != 0) && rgb_enable[2];
+	brightness btr ( .value(rgb_red),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb1[0]) );
+	brightness btg ( .value(rgb_green), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb1[1]) );
+	brightness btb ( .value(rgb_blue),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb1[2]) );
 	assign rgb2 = rgb1; /* mirror top/bottom */
 
 	/* use this signal for insight! */
