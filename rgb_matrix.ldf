@@ -36,6 +36,9 @@
         <Source name="pixel_split.v" type="Verilog" type_short="Verilog">
             <Options/>
         </Source>
+        <Source name="framebuffer_fetch.v" type="Verilog" type_short="Verilog">
+            <Options/>
+        </Source>
         <Source name="rgb_matrix.lpf" type="Logic Preference" type_short="LPF">
             <Options/>
         </Source>

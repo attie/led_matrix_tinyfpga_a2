@@ -30,6 +30,14 @@ module main (
 
 	wire row_latch;
 
+	wire [15:0] ram_b_data_out;
+	wire [10:0] ram_b_addr;
+	wire ram_b_clk_enable;
+	wire ram_b_reset;
+
+	wire [15:0] pixel_rgb565_top;
+	wire [15:0] pixel_rgb565_bottom;
+
 	wire uart_rx;
 
 	wire [5:0] column_address;
@@ -59,6 +67,7 @@ module main (
 		.running(global_reset)
 	);
 
+	/* produce a clock for use on the LED matrix */
 	clock_divider #(
 		.CLK_DIV_WIDTH(3),
 		.CLK_DIV_COUNT(4)
@@ -82,61 +91,22 @@ module main (
 		.brightness_mask(brightness_mask)
 	);
 
-	/* grab data on falling edge of pixel clock */
-	wire pixel_load_running;
-	wire [3:0] pixel_load_counter;
-	wire [15:0] pixel_rgb565_read;
-	reg [15:0] pixel_rgb565_top;
-	reg [15:0] pixel_rgb565_bottom;
-	reg [10:0] ram_addr = 'd0;
-
-	timeout #(
-		.COUNTER_WIDTH(3)
-	) timeout_pixel_load (
+	/* the fetch controller */
+	framebuffer_fetch fb_f (
 		.reset(global_reset),
 		.clk_in(clk_root),
-		.start(clk_pixel_load),
-		.value(3'd7),
-		.counter(pixel_load_counter),
-		.running(pixel_load_running)
-	);
 
-	always @(negedge clk_root) begin
-		/* the RAM requires _two_ clock cycles to read... */
-		if (pixel_load_counter == 'd7) begin
-			/* setup the top-half address */
-			ram_addr <= { 1'b0, row_address[3:0], ~column_address[5:0] };
-		end
-		else if (pixel_load_counter == 'd5) begin
-			/* latch the pixel's value */
-			pixel_rgb565_top <= pixel_rgb565_read;
-		end
-		else if (pixel_load_counter == 'd3) begin
-			/* setup the bottom-half address */
-			ram_addr <= { 1'b1, row_address[3:0], ~column_address[5:0] };
-		end
-		else if (pixel_load_counter == 'd1) begin
-			/* latch the pixel's value */
-			pixel_rgb565_bottom <= pixel_rgb565_read;
-		end
-	end
+		.column_address(column_address),
+		.row_address(row_address),
+		.pixel_load_start(clk_pixel_load),
 
-	/* the framebuffer */
-	framebuffer fb (
-		.DataInA(8'b0),
-		.DataInB(16'b0),
-		.AddressA(12'b0),
-		.AddressB(ram_addr),
-		.ClockA(1'b0),
-		.ClockB(clk_root),
-		.ClockEnA(1'b0),
-		.ClockEnB(pixel_load_running),
-		.WrA(1'b0),
-		.WrB(1'b0),
-		.ResetA(global_reset),
-		.ResetB(global_reset),
-		.QA(),
-		.QB(pixel_rgb565_read)
+		.ram_data_in(ram_b_data_out),
+		.ram_addr(ram_b_addr),
+		.ram_clk_enable(ram_b_clk_enable),
+		.ram_reset(ram_b_reset),
+
+		.rgb565_top(pixel_rgb565_top),
+		.rgb565_bottom(pixel_rgb565_bottom)
 	);
 
 	/* the control module */
@@ -146,6 +116,24 @@ module main (
 		.uart_rx(uart_rx),
 		.rgb_enable(rgb_enable),
 		.rx_running(rx_running)
+	);
+
+	/* the framebuffer */
+	framebuffer fb (
+		.DataInA(8'b0),
+		.DataInB(16'b0),
+		.AddressA(12'b0),
+		.AddressB(ram_b_addr),
+		.ClockA(1'b0),
+		.ClockB(clk_root),
+		.ClockEnA(1'b0),
+		.ClockEnB(ram_b_clk_enable),
+		.WrA(1'b0),
+		.WrB(1'b0),
+		.ResetA(global_reset),
+		.ResetB(ram_b_reset),
+		.QA(),
+		.QB(ram_b_data_out)
 	);
 
 	/* split the pixels and get the current brightness' bit */
