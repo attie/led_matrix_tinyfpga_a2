@@ -69,6 +69,7 @@ There are fundamentally only three components:
       - Blue &rarr; ~2.35 k&ohm; &rarr; ~6 mA
     - Data is shifted in and through a chain of 4&times;
       - All parts share `Clock`, `#Output_Enable` and `Latch`
+      - A `1` will enable the current sink
       - Each chain gets one of the colors, e.g:
         - "_Input Connector_" &rarr; `UB1`.`SDI`
         - `UB1`.`SDO` &rarr; `UB5`.`SDI`
