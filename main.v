@@ -24,6 +24,8 @@ module main (
 	wire global_reset;
 
 	wire clk_root;
+	wire clk_matrix;
+	wire clk_pixel_load;
 	wire clk_pixel;
 
 	wire row_latch;
@@ -35,9 +37,13 @@ module main (
 	wire [3:0] row_address_active;
 	wire [5:0] brightness_mask;
 
-	wire [5:0] rgb_red;
-	wire [5:0] rgb_green;
-	wire [5:0] rgb_blue;
+	wire [5:0] rgb_red_top;
+	wire [5:0] rgb_green_top;
+	wire [5:0] rgb_blue_top;
+
+	wire [5:0] rgb_red_bottom;
+	wire [5:0] rgb_green_bottom;
+	wire [5:0] rgb_blue_bottom;
 
 	wire [2:0] rgb_enable;
 	wire [2:0] rgb1; /* the current RGB value for the top-half of the display */
@@ -61,26 +67,84 @@ module main (
 		.running(global_reset)
 	);
 
+	clock_divider #(
+		.CLK_DIV_WIDTH(3),
+		.CLK_DIV_COUNT(4)
+	) clkdiv_matrix (
+		.reset(global_reset),
+		.clk_in(clk_root),
+		.clk_out(clk_matrix)
+	);
+
 	/* produce signals to scan a 64x32 LED matrix, with 6-bit color */
 	matrix_scan matscan1 (
 		.reset(global_reset),
-		.clk_in(clk_root),
+		.clk_in(clk_matrix),
 		.column_address(column_address),
 		.row_address(row_address),
 		.row_address_active(row_address_active),
-		.clk_pixel_load(),
+		.clk_pixel_load(clk_pixel_load),
 		.clk_pixel(clk_pixel),
 		.row_latch(row_latch),
 		.output_enable(output_enable),
 		.brightness_mask(brightness_mask)
 	);
 
-	/* produce signals to fill a LED matrix with a color gradient / rainbow */
-	rainbow_generator bowgen (
-		.column_address(column_address),
-		.red(rgb_red),
-		.green(rgb_green),
-		.blue(rgb_blue)
+	/* grab data on falling edge of pixel clock */
+	wire pixel_load_running;
+	wire [3:0] pixel_load_counter;
+	wire [15:0] pixel_rgb565_read;
+	reg [15:0] pixel_rgb565_top;
+	reg [15:0] pixel_rgb565_bottom;
+	reg [10:0] ram_addr = 'd0;
+
+	timeout #(
+		.COUNTER_WIDTH(3)
+	) timeout_pixel_load (
+		.reset(global_reset),
+		.clk_in(clk_root),
+		.start(clk_pixel_load),
+		.value(3'd7),
+		.counter(pixel_load_counter),
+		.running(pixel_load_running)
+	);
+
+	always @(negedge clk_root) begin
+		/* the RAM requires _two_ clock cycles to read... */
+		if (pixel_load_counter == 'd7) begin
+			/* setup the top-half address */
+			ram_addr <= { 1'b0, row_address[3:0], ~column_address[5:0] };
+		end
+		else if (pixel_load_counter == 'd5) begin
+			/* latch the pixel's value */
+			pixel_rgb565_top <= pixel_rgb565_read;
+		end
+		else if (pixel_load_counter == 'd3) begin
+			/* setup the bottom-half address */
+			ram_addr <= { 1'b1, row_address[3:0], ~column_address[5:0] };
+		end
+		else if (pixel_load_counter == 'd1) begin
+			/* latch the pixel's value */
+			pixel_rgb565_bottom <= pixel_rgb565_read;
+		end
+	end
+
+	/* the framebuffer */
+	framebuffer fb (
+		.DataInA(8'b0),
+		.DataInB(16'b0),
+		.AddressA(12'b0),
+		.AddressB(ram_addr),
+		.ClockA(1'b0),
+		.ClockB(clk_root),
+		.ClockEnA(1'b0),
+		.ClockEnB(pixel_load_running),
+		.WrA(1'b0),
+		.WrB(1'b0),
+		.ResetA(global_reset),
+		.ResetB(global_reset),
+		.QA(),
+		.QB(pixel_rgb565_read)
 	);
 
 	/* the control module */
@@ -94,11 +158,27 @@ module main (
 		.rx_running(rx_running)
 	);
 
+	rgb565 rgb_top (
+		.rgb565(pixel_rgb565_top),
+		.red(rgb_red_top),
+		.green(rgb_green_top),
+		.blue(rgb_blue_top)
+	);
 	/* apply the brightness mask to the calculated sub-pixel value */
-	brightness btr ( .value(rgb_red),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb1[0]) );
-	brightness btg ( .value(rgb_green), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb1[1]) );
-	brightness btb ( .value(rgb_blue),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb1[2]) );
-	assign rgb2 = rgb1; /* mirror top/bottom */
+	brightness btr ( .value(rgb_red_top),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb1[0]) );
+	brightness btg ( .value(rgb_green_top), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb1[1]) );
+	brightness btb ( .value(rgb_blue_top),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb1[2]) );
+
+	rgb565 rgb_bottom (
+		.rgb565(pixel_rgb565_bottom),
+		.red(rgb_red_bottom),
+		.green(rgb_green_bottom),
+		.blue(rgb_blue_bottom)
+	);
+	/* apply the brightness mask to the calculated sub-pixel value */
+	brightness bbr ( .value(rgb_red_bottom),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb2[0]) );
+	brightness bbg ( .value(rgb_green_bottom), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb2[1]) );
+	brightness bbb ( .value(rgb_blue_bottom),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb2[2]) );
 
 	/* use this signal for insight! */
 	assign debug = 1'b0;

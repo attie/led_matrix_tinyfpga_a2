@@ -6,3 +6,11 @@
 /reportview.xml
 /res/*.bin
 /res/*.mem
+
+/*.edn
+/*.naf
+/*.sort
+/*.srp
+/*.sym
+/*_generate.log
+/*_tmpl.v

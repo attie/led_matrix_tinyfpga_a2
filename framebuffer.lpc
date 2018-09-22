@@ -1,0 +1,56 @@
+[Device]
+Family=machxo2
+PartType=LCMXO2-1200HC
+PartName=LCMXO2-1200HC-4SG32C
+SpeedGrade=4
+Package=QFN32
+OperatingCondition=COM
+Status=S
+
+[IP]
+VendorName=Lattice Semiconductor Corporation
+CoreType=LPM
+CoreStatus=Demo
+CoreName=RAM_DP_TRUE
+CoreRevision=7.5
+ModuleName=framebuffer
+SourceFormat=Verilog HDL
+ParameterFileVersion=1.0
+Date=09/22/2018
+Time=19:20:37
+
+[Parameters]
+Verilog=1
+VHDL=0
+EDIF=1
+Destination=Synplicity
+Expression=BusA(0 to 7)
+Order=Big Endian [MSB:LSB]
+IO=0
+RAddress=4096
+RData=8
+WAddress=2048
+WData=16
+ROutputEn=1
+RClockEn=0
+WOutputEn=1
+WClockEn=0
+enByte=0
+ByteSize=9
+Optimization=Speed
+Reset=Sync
+Reset1=Sync
+Init=mem
+MemFile=z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem
+MemFormat=hex
+EnECC=0
+Pipeline=0
+WriteA=Normal
+WriteB=Normal
+init_data=1
+
+[FilesGenerated]
+z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem=mem
+
+[Command]
+cmd_line= -w -n framebuffer -lang verilog -synth lse -bus_exp 7 -bb -arch xo2c00 -type ramdp -device LCMXO2-1200HC -aaddr_width 12 -widtha 8 -baddr_width 11 -widthb 16 -anum_words 4096 -bnum_words 2048 -outdataA REGISTERED -outdataB REGISTERED -cascade -1 -resetmode SYNC -sync_reset -memfile z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem -memformat hex -init_data DYNAMIC -writemodeA NORMAL -writemodeB NORMAL
