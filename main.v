@@ -37,14 +37,6 @@ module main (
 	wire [3:0] row_address_active;
 	wire [5:0] brightness_mask;
 
-	wire [5:0] rgb_red_top;
-	wire [5:0] rgb_green_top;
-	wire [5:0] rgb_blue_top;
-
-	wire [5:0] rgb_red_bottom;
-	wire [5:0] rgb_green_bottom;
-	wire [5:0] rgb_blue_bottom;
-
 	wire [2:0] rgb_enable;
 	wire [2:0] rgb1; /* the current RGB value for the top-half of the display */
 	wire [2:0] rgb2; /* the current RGB value for the bottom-half of the display */
@@ -158,27 +150,19 @@ module main (
 		.rx_running(rx_running)
 	);
 
-	rgb565 rgb_top (
-		.rgb565(pixel_rgb565_top),
-		.red(rgb_red_top),
-		.green(rgb_green_top),
-		.blue(rgb_blue_top)
+	/* split the pixels and get the current brightness' bit */
+	pixel_split px_top (
+		.pixel_rgb565(pixel_rgb565_top),
+		.brightness_mask(brightness_mask),
+		.rgb_enable(rgb_enable),
+		.rgb_output(rgb1)
 	);
-	/* apply the brightness mask to the calculated sub-pixel value */
-	brightness btr ( .value(rgb_red_top),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb1[0]) );
-	brightness btg ( .value(rgb_green_top), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb1[1]) );
-	brightness btb ( .value(rgb_blue_top),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb1[2]) );
-
-	rgb565 rgb_bottom (
-		.rgb565(pixel_rgb565_bottom),
-		.red(rgb_red_bottom),
-		.green(rgb_green_bottom),
-		.blue(rgb_blue_bottom)
+	pixel_split px_bottom (
+		.pixel_rgb565(pixel_rgb565_bottom),
+		.brightness_mask(brightness_mask),
+		.rgb_enable(rgb_enable),
+		.rgb_output(rgb2)
 	);
-	/* apply the brightness mask to the calculated sub-pixel value */
-	brightness bbr ( .value(rgb_red_bottom),   .mask(brightness_mask), .enable(rgb_enable[0]), .out(rgb2[0]) );
-	brightness bbg ( .value(rgb_green_bottom), .mask(brightness_mask), .enable(rgb_enable[1]), .out(rgb2[1]) );
-	brightness bbb ( .value(rgb_blue_bottom),  .mask(brightness_mask), .enable(rgb_enable[2]), .out(rgb2[2]) );
 
 	/* use this signal for insight! */
 	assign debug = 1'b0;
