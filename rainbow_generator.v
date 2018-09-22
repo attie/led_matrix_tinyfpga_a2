@@ -1,6 +1,6 @@
 module rainbow_generator (
 	input [7:0] column_address,
-	
+
 	output [5:0] red,
 	output [5:0] green,
 	output [5:0] blue
@@ -13,7 +13,7 @@ module rainbow_generator (
 	assign column_phase[0] = (column_address < 8'd21);
 	assign column_phase[1] = (column_address < 8'd42) && (column_address >= 8'd21);
 	//assign column_phase[2] =                             (column_address >= 8'd42);
-	
+
 	/* each sub-pixel has a 6-bit brightness value, which depends on the column phase and maths
 	   red   --> hi - lo - lo - hi
 	   green --> lo - hi - lo - lo

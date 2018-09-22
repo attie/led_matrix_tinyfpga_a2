@@ -12,16 +12,16 @@ module timeout #(
 	input reset,
 	input clk_in,
 	input start,
-	
+
 	input [COUNTER_WIDTH - 1:0] value,
 	output reg [COUNTER_WIDTH - 1:0] counter,
-	
+
 	output running
 );
 	reg start_latch = 1'b0;
-	
+
 	assign running = counter != 0;
-	
+
 	always @(posedge clk_in, posedge reset) begin
 		if (reset) begin
 			counter <= 'b0;

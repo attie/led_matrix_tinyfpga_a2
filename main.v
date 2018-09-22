@@ -20,23 +20,23 @@ module main (
 	inout pin22
 );
 	wire debug;
-	
+
 	wire clk_root;
 	wire clk_pixel;
 
 	wire row_latch;
-	
+
 	wire [7:0] column_address;
 	wire [3:0] row_address;
 	wire [5:0] brightness_mask;
-	
+
 	wire [5:0] rgb_red;
 	wire [5:0] rgb_green;
 	wire [5:0] rgb_blue;
-	
+
 	wire [2:0] rgb1; /* the current RGB value for the top-half of the display */
 	wire [2:0] rgb2; /* the current RGB value for the bottom-half of the display */
-	
+
 	OSCH #(
 		.NOM_FREQ("7.00")
 	) osc (
@@ -44,7 +44,7 @@ module main (
 		.OSC(clk_root),
 		.SEDSTDBY()
 	);
-	
+
 	/* produces a global reset */
 	wire global_reset;
 	timeout timeout_global_reset (
@@ -67,7 +67,7 @@ module main (
 		.output_enable(output_enable),
 		.brightness_mask(brightness_mask)
 	);
-	
+
 	/* produce signals to fill a LED matrix with a color gradient / rainbow */
 	rainbow_generator bowgen (
 		.column_address(column_address),
@@ -75,7 +75,7 @@ module main (
 		.green(rgb_green),
 		.blue(rgb_blue)
 	);
-	
+
 	/* apply the brightness mask to the calculated sub-pixel value */
 	assign rgb1[0] = ((rgb_red   & brightness_mask) != 0);
 	assign rgb1[1] = ((rgb_green & brightness_mask) != 0);
