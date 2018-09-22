@@ -8,9 +8,7 @@ module control_module #(
 
 	input uart_rx,
 
-	output reg enable_red = 1'b1,
-	output reg enable_green = 1'b1,
-	output reg enable_blue = 1'b1,
+	output reg [2:0] rgb_enable = 3'b111,
 
 	output debug,
 	output rx_running
@@ -35,18 +33,16 @@ module control_module #(
 
 	always @(negedge uart_rx_running, posedge reset) begin
 		if (reset) begin
-			enable_red   <= 1'b1;
-			enable_green <= 1'b1;
-			enable_blue  <= 1'b1;
+			rgb_enable <= 3'b111;
 		end
 		else if (!uart_rx_invalid) begin
 			case (uart_rx_data)
-				"R": enable_red   <= 1'b1;
-				"r": enable_red   <= 1'b0;
-				"G": enable_green <= 1'b1;
-				"g": enable_green <= 1'b0;
-				"B": enable_blue  <= 1'b1;
-				"b": enable_blue  <= 1'b0;
+				"R": rgb_enable[0] <= 1'b1;
+				"r": rgb_enable[0] <= 1'b0;
+				"G": rgb_enable[1] <= 1'b1;
+				"g": rgb_enable[1] <= 1'b0;
+				"B": rgb_enable[2] <= 1'b1;
+				"b": rgb_enable[2] <= 1'b0;
 			endcase
 		end
 	end

@@ -144,9 +144,7 @@ module main (
 		.reset(global_reset),
 		.clk_in(clk_root),
 		.uart_rx(uart_rx),
-		.enable_red(rgb_enable[0]),
-		.enable_green(rgb_enable[1]),
-		.enable_blue(rgb_enable[2]),
+		.rgb_enable(rgb_enable),
 		.rx_running(rx_running)
 	);
 
