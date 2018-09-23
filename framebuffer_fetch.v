@@ -31,7 +31,7 @@ module framebuffer_fetch (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(pixel_load_start),
-		.value(3'd7),
+		.value(3'd3),
 		.counter(pixel_load_counter),
 		.running(ram_clk_enable)
 	);
@@ -44,20 +44,21 @@ module framebuffer_fetch (
 			rgb565_bottom <= 16'd0;
 		end
 		else begin
-			/* the RAM requires _two_ clock cycles to read... */
-			if (pixel_load_counter == 'd7) begin
+			/* the RAM requires _two_ clock cycles to read...
+			   but change the address every clock cycle, so long as we respect the two-cycle fetch */
+			if (pixel_load_counter == 'd3) begin
 				/* setup the top-half address */
 				half_address <= 1'b0;
 			end
-			else if (pixel_load_counter == 'd5) begin
-				/* latch the pixel's value */
-				rgb565_top <= ram_data_in;
-			end
-			else if (pixel_load_counter == 'd3) begin
+			else if (pixel_load_counter == 'd2) begin
 				/* setup the bottom-half address */
 				half_address <= 1'b1;
 			end
 			else if (pixel_load_counter == 'd1) begin
+				/* latch the pixel's value */
+				rgb565_top <= ram_data_in;
+			end
+			else if (pixel_load_counter == 'd0) begin
 				/* latch the pixel's value */
 				rgb565_bottom <= ram_data_in;
 			end
