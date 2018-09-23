@@ -114,26 +114,31 @@ module main (
 	control_module ctrl (
 		.reset(global_reset),
 		.clk_in(clk_root),
+
 		.uart_rx(uart_rx),
+		.rx_running(rx_running),
+
 		.rgb_enable(rgb_enable),
-		.rx_running(rx_running)
 	);
 
 	/* the framebuffer */
 	framebuffer fb (
+		/* control module interface */
 		.DataInA(8'b0),
-		.DataInB(16'b0),
 		.AddressA(12'b0),
-		.AddressB(ram_b_address),
 		.ClockA(1'b0),
-		.ClockB(clk_root),
 		.ClockEnA(1'b0),
-		.ClockEnB(ram_b_clk_enable),
 		.WrA(1'b0),
-		.WrB(1'b0),
 		.ResetA(global_reset),
-		.ResetB(ram_b_reset),
 		.QA(),
+
+		/* display interface */
+		.DataInB(16'b0),
+		.AddressB(ram_b_address),
+		.ClockB(clk_root),
+		.ClockEnB(ram_b_clk_enable),
+		.WrB(1'b0),
+		.ResetB(ram_b_reset),
 		.QB(ram_b_data_out)
 	);
 

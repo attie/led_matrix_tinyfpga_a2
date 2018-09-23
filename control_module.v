@@ -8,11 +8,9 @@ module control_module #(
 	input clk_in,
 
 	input uart_rx,
+	output rx_running,
 
 	output reg [2:0] rgb_enable = 3'b111,
-
-	output debug,
-	output rx_running
 );
 	wire [7:0] uart_rx_data;
 	wire uart_rx_running;
