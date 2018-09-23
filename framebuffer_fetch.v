@@ -8,7 +8,7 @@ module framebuffer_fetch (
 	input pixel_load_start,
 
 	input [15:0] ram_data_in,
-	output reg [10:0] ram_address,
+	output [10:0] ram_address,
 	output ram_clk_enable,
 	output ram_reset,
 
@@ -19,6 +19,9 @@ module framebuffer_fetch (
 	/* grab data on falling edge of pixel clock */
 	wire pixel_load_running;
 	wire [3:0] pixel_load_counter;
+
+	reg half_address;
+	assign ram_address = { half_address, row_address[3:0], ~column_address[5:0] };
 
 	assign ram_reset = reset;
 
@@ -35,7 +38,7 @@ module framebuffer_fetch (
 
 	always @(negedge clk_in, posedge reset) begin
 		if (reset) begin
-			ram_address <= 11'd0;
+			half_address <= 1'b0;
 
 			rgb565_top    <= 16'd0;
 			rgb565_bottom <= 16'd0;
@@ -44,7 +47,7 @@ module framebuffer_fetch (
 			/* the RAM requires _two_ clock cycles to read... */
 			if (pixel_load_counter == 'd7) begin
 				/* setup the top-half address */
-				ram_address <= { 1'b0, row_address[3:0], ~column_address[5:0] };
+				half_address <= 1'b0;
 			end
 			else if (pixel_load_counter == 'd5) begin
 				/* latch the pixel's value */
@@ -52,7 +55,7 @@ module framebuffer_fetch (
 			end
 			else if (pixel_load_counter == 'd3) begin
 				/* setup the bottom-half address */
-				ram_address <= { 1'b1, row_address[3:0], ~column_address[5:0] };
+				half_address <= 1'b1;
 			end
 			else if (pixel_load_counter == 'd1) begin
 				/* latch the pixel's value */
