@@ -31,7 +31,7 @@ module main (
 	wire row_latch;
 
 	wire [15:0] ram_b_data_out;
-	wire [10:0] ram_b_addr;
+	wire [10:0] ram_b_address;
 	wire ram_b_clk_enable;
 	wire ram_b_reset;
 
@@ -101,7 +101,7 @@ module main (
 		.pixel_load_start(clk_pixel_load),
 
 		.ram_data_in(ram_b_data_out),
-		.ram_addr(ram_b_addr),
+		.ram_address(ram_b_address),
 		.ram_clk_enable(ram_b_clk_enable),
 		.ram_reset(ram_b_reset),
 
@@ -123,7 +123,7 @@ module main (
 		.DataInA(8'b0),
 		.DataInB(16'b0),
 		.AddressA(12'b0),
-		.AddressB(ram_b_addr),
+		.AddressB(ram_b_address),
 		.ClockA(1'b0),
 		.ClockB(clk_root),
 		.ClockEnA(1'b0),
