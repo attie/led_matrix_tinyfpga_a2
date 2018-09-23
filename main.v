@@ -50,6 +50,7 @@ module main (
 	wire [2:0] rgb2; /* the current RGB value for the bottom-half of the display */
 
 	OSCH #(
+		//.NOM_FREQ("7.00")
 		.NOM_FREQ("53.20")
 	) osc (
 		.STDBY(1'b0), 
