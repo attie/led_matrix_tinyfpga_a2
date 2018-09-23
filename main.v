@@ -30,6 +30,13 @@ module main (
 
 	wire row_latch;
 
+	wire [7:0] ram_a_data_in;
+	wire [7:0] ram_a_data_out;
+	wire [11:0] ram_a_address;
+	wire ram_a_write_enable;
+	wire ram_a_clk_enable;
+	wire ram_a_reset;
+
 	wire [15:0] ram_b_data_out;
 	wire [10:0] ram_b_address;
 	wire ram_b_clk_enable;
@@ -119,18 +126,25 @@ module main (
 		.rx_running(rx_running),
 
 		.rgb_enable(rgb_enable),
+
+		.ram_data_in(ram_a_data_out),
+		.ram_data_out(ram_a_data_in),
+		.ram_address(ram_a_address),
+		.ram_write_enable(ram_a_write_enable),
+		.ram_clk_enable(ram_a_clk_enable),
+		.ram_reset(ram_a_reset)
 	);
 
 	/* the framebuffer */
 	framebuffer fb (
 		/* control module interface */
-		.DataInA(8'b0),
-		.AddressA(12'b0),
-		.ClockA(1'b0),
-		.ClockEnA(1'b0),
-		.WrA(1'b0),
+		.DataInA(ram_a_data_in),
+		.AddressA(ram_a_address),
+		.ClockA(clk_root),
+		.ClockEnA(ram_a_clk_enable),
+		.WrA(ram_a_write_enable),
 		.ResetA(global_reset),
-		.QA(),
+		.QA(ram_a_data_out),
 
 		/* display interface */
 		.DataInB(16'b0),

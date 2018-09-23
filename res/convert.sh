@@ -34,3 +34,11 @@ xxd -p -c1 \
 	< "${OUTPUT_BASE}.bin" \
 	| sed -re 's/^(..)(..)$/\2\n\1/' \
 	> "${OUTPUT_BASE}.mem"
+
+# convert the raw frame buffer to lines to be sent via UART
+xxd -p -c$((64 * 2)) \
+	< "${OUTPUT_BASE}.bin" \
+	| sed -re 's/(..)(..)/\2\1/g' \
+	| awk '{printf "4C%02x%s\n", NR-1, $0}' \
+	| xxd -r -p \
+	> "${OUTPUT_BASE}.uart"
