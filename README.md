@@ -57,7 +57,7 @@ A baudrate of ~2 Mbit/s should be easy enough to work with, and should provide a
 ### Solid Display
 
 The LED matrix is driven fast enough that each row is rendered beyond what is troubling to the human eye - something that seriously bugs me.
-This means that glancing away or past the display won't leave flickering streaks - somewhat like Physics Girl outlines in her "[The Projector Illusion](https://www.youtube.com/watch?v=Xp6bxCh_p7c)" video.
+This means that glancing away or past the display won't leave flickering streaks - somewhat like Dianna outlines in her "[The Projector Illusion](https://www.youtube.com/watch?v=Xp6bxCh_p7c)" video.
 
 To keep up with this, the display must be rendered from internal memory, and cannot feasably be driven directly via the UART.
 
