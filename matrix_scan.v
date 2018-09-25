@@ -30,6 +30,7 @@ module matrix_scan (
 	/* produces the state-advance clock
 	   states produce brighter and brighter pixels before advancing to the next row */
 	clock_divider #(
+		.CLK_DIV_WIDTH(6),
 		.CLK_DIV_COUNT(33) /* 33 * 2 = 66... each row takes 64 pixels, +1 latch = 65 clock cycles */
 	) clkdiv_state (
 		.reset(reset),
@@ -72,11 +73,13 @@ module matrix_scan (
 
 	/* delays the row latch enable
 	   after 63x pixel clocks, we let the latch enable timeout run */
-	timeout timeout_row_latch_delay (
+	timeout #(
+		.COUNTER_WIDTH(6)
+	) timeout_row_latch_delay (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(clk_pixel_load_en),
-		.value(8'd63),
+		.value(6'd63),
 		.counter(),
 		.running(row_latch_delay)
 	);
@@ -84,11 +87,13 @@ module matrix_scan (
 	/* produces the row latch enable signal
 	   starts once row_latch_delay is complete
 	   start is sampled on the rising clk_in edge, thus we get a latch pulse one clock cycle after the last pixel clock */
-	timeout timeout_row_latch_en (
+	timeout #(
+		.COUNTER_WIDTH(1)
+	) timeout_row_latch_en (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(~row_latch_delay),
-		.value(8'd1),
+		.value(1'd1),
 		.counter(),
 		.running(row_latch_en)
 	);
@@ -106,7 +111,9 @@ module matrix_scan (
 	/* produces the variable-width output enable signal
 	   this signal is controlled by the rolling brightness_mask_active signal (brightness_mask has advanced already)
 	   the wider the output_enable pulse, the brighter the LEDs */
-	timeout timeout_output_enable (
+	timeout #(
+		.COUNTER_WIDTH(8)
+	) timeout_output_enable (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(~row_latch_en),

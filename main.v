@@ -66,18 +66,20 @@ module main (
 	);
 
 	/* produces a global reset */
-	timeout timeout_global_reset (
+	timeout #(
+		.COUNTER_WIDTH(4)
+	) timeout_global_reset (
 		.reset(1'b0),
 		.clk_in(clk_root),
 		.start(1'b1),
-		.value(8'd16),
+		.value(4'd15),
 		.counter(),
 		.running(global_reset)
 	);
 
 	/* produce a clock for use on the LED matrix */
 	clock_divider #(
-		.CLK_DIV_WIDTH(3),
+		.CLK_DIV_WIDTH(2),
 		.CLK_DIV_COUNT(2)
 	) clkdiv_matrix (
 		.reset(global_reset),

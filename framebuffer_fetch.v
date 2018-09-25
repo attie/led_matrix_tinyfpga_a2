@@ -26,12 +26,12 @@ module framebuffer_fetch (
 	assign ram_reset = reset;
 
 	timeout #(
-		.COUNTER_WIDTH(3)
+		.COUNTER_WIDTH(2)
 	) timeout_pixel_load (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(pixel_load_start),
-		.value(3'd3),
+		.value(2'd3),
 		.counter(pixel_load_counter),
 		.running(ram_clk_enable)
 	);
