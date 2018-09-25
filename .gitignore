@@ -4,8 +4,10 @@
 /*_tcr.dir/
 /promote.xml
 /reportview.xml
-/res/*.bin
+
+/res/.*.bin
 /res/*.mem
+/res/*.uart
 
 /*.edn
 /*.naf
