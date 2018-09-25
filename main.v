@@ -58,7 +58,8 @@ module main (
 
 	OSCH #(
 		//.NOM_FREQ("7.00")
-		.NOM_FREQ("53.20")
+		//.NOM_FREQ("53.20")
+		.NOM_FREQ("133.00")
 	) osc (
 		.STDBY(1'b0), 
 		.OSC(clk_root),
@@ -80,7 +81,7 @@ module main (
 	/* produce a clock for use on the LED matrix */
 	clock_divider #(
 		.CLK_DIV_WIDTH(2),
-		.CLK_DIV_COUNT(2)
+		.CLK_DIV_COUNT(3)
 	) clkdiv_matrix (
 		.reset(global_reset),
 		.clk_in(clk_root),
