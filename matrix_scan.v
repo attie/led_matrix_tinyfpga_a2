@@ -20,6 +20,8 @@ module matrix_scan (
 	wire row_latch_delay; /* delays the row_latch timeout */
 	wire row_latch_en;    /* enables the row latch */
 
+	wire clk_row_address; /* on the falling edge, feed the row address to the active signals */
+
 	reg  [5:0] brightness_mask_active; /* the active mask value (LEDs enabled)... from before the state advanced */
 	wire [7:0] brightness_timeout;     /* used to time the output enable period */
 
@@ -122,10 +124,23 @@ module matrix_scan (
 		.running(output_enable)
 	);
 
+	/* produces the delayed row latch signal
+	   this signal needs to be approximately at the midpoint between output disable and enable edges
+	   if it's too close to one or another, then we get more bleed */
+	timeout #(
+		.COUNTER_WIDTH(4)
+	) timeout_row_address (
+		.reset(reset),
+		.clk_in(clk_in),
+		.start(~output_enable),
+		.value('d15),
+		.counter(),
+		.running(clk_row_address)
+	);
+
 	/* on completion of the row_latch_delay, we advanced the brightness mask to generate the next row of pixels */
 	always @(posedge row_latch_en) begin
 		brightness_mask_active <= brightness_mask;
-		row_address_active <= row_address;
 
 		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b100000)) begin
 			/* catch the initial value / oopsy */
@@ -135,5 +150,10 @@ module matrix_scan (
 		else begin
 			brightness_mask <= brightness_mask << 1;
 		end
+	end
+
+	/* push the row address to the active output */
+	always @(negedge clk_row_address) begin
+		row_address_active <= row_address;
 	end
 endmodule
