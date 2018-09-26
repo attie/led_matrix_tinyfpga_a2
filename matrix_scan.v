@@ -40,18 +40,18 @@ module matrix_scan (
 		  =  66 cycles  A - total duration for one row clock-out
 
 	      +   1 cycle     - output enable delay
-	      +  32 cycles    - max brightness duration of output enable
-	      +  34 cycles    - row_address update delay (to reduce bleed)... x2 to center it
-	      = 133 cycles  B - total duration from start of state to start of next state's otuput enable
+	      +  64 cycles    - max brightness duration of output enable
+	      +  14 cycles    - row_address update delay (to reduce bleed)... x2 to center it
+	      = 145 cycles  B - total duration from start of state to start of next state's otuput enable
 
 	      -  66 cycles    - (A)
-	      =  67 cycles  C - minimum state clock rate
+	      =  79 cycles  C - minimum state clock rate
 
 	      /   2           - clock divider modules divide twice (toggle on zero)
-	      =  33 cycles  D - mimimum value of clock divider */
+	      =  40 cycles  D - mimimum value of clock divider */
 	clock_divider #(
 		.CLK_DIV_WIDTH(8),
-		.CLK_DIV_COUNT(33) /* see calculations above, use (D) here... */
+		.CLK_DIV_COUNT(40) /* see calculations above, use (D) here... */
 	) clkdiv_state (
 		.reset(reset),
 		.clk_in(clk_in),
@@ -122,10 +122,10 @@ module matrix_scan (
 	assign brightness_timeout = 
 		(brightness_mask_active == 6'b000001) ? 8'd1 :
 		(brightness_mask_active == 6'b000010) ? 8'd2 :
-		(brightness_mask_active == 6'b000100) ? 8'd4 :
-		(brightness_mask_active == 6'b001000) ? 8'd8 :
-		(brightness_mask_active == 6'b010000) ? 8'd16 :
-		(brightness_mask_active == 6'b100000) ? 8'd32 :
+		(brightness_mask_active == 6'b000100) ? 8'd8 :
+		(brightness_mask_active == 6'b001000) ? 8'd16 :
+		(brightness_mask_active == 6'b010000) ? 8'd32 :
+		(brightness_mask_active == 6'b100000) ? 8'd64 :
 		8'd0;
 
 	/* produces the variable-width output enable signal
@@ -148,12 +148,12 @@ module matrix_scan (
 	   too small a value causes bleed down, too large causes bleed up
 	   aim for the middle, but you might have to make the gap larger */
 	timeout #(
-		.COUNTER_WIDTH(5)
+		.COUNTER_WIDTH(3)
 	) timeout_row_address (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(~output_enable),
-		.value('d17),
+		.value('d7),
 		.counter(),
 		.running(clk_row_address)
 	);
