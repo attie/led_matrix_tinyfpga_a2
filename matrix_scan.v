@@ -9,7 +9,7 @@ module matrix_scan (
 	output clk_pixel_load,
 	output clk_pixel,
 	output row_latch,
-	output output_enable,
+	output output_enable, /* the minimum output enable pulse should not be shorter than 1us... */
 
 	output reg [5:0] brightness_mask /* used to pick a bit from the sub-pixel's brightness */
 );
@@ -115,8 +115,8 @@ module matrix_scan (
 
 	/* decide how long to enable the LEDs for... we probably need some gamma correction here */
 	assign brightness_timeout = 
-		(brightness_mask_active == 6'b000001) ? 8'd1 :
-		(brightness_mask_active == 6'b000010) ? 8'd2 :
+		(brightness_mask_active == 6'b000001) ? 8'd2 :
+		(brightness_mask_active == 6'b000010) ? 8'd4 :
 		(brightness_mask_active == 6'b000100) ? 8'd8 :
 		(brightness_mask_active == 6'b001000) ? 8'd16 :
 		(brightness_mask_active == 6'b010000) ? 8'd32 :

@@ -80,12 +80,8 @@ module main (
 
 	/* produce a clock for use on the LED matrix */
 	clock_divider #(
-		/* the following will give a matrix clock of ~1 MHz from a 133 MHz
-		   root clock - better for visibility */
-		//.CLK_DIV_WIDTH(6),
-		//.CLK_DIV_COUNT(63)
-		.CLK_DIV_WIDTH(2),
-		.CLK_DIV_COUNT(3)
+		.CLK_DIV_WIDTH(6),
+		.CLK_DIV_COUNT(24)
 	) clkdiv_matrix (
 		.reset(global_reset),
 		.clk_in(clk_root),
