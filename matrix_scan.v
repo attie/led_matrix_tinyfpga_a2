@@ -39,19 +39,14 @@ module matrix_scan (
 	      +   1 cycle     - row latch
 		  =  66 cycles  A - total duration for one row clock-out
 
-	      +   1 cycle     - output enable delay
-	      +  64 cycles    - max brightness duration of output enable
-	      +  14 cycles    - row_address update delay (to reduce bleed)... x2 to center it
-	      = 145 cycles  B - total duration from start of state to start of next state's otuput enable
-
-	      -  66 cycles    - (A)
-	      =  79 cycles  C - minimum state clock rate
-
 	      /   2           - clock divider modules divide twice (toggle on zero)
-	      =  40 cycles  D - mimimum value of clock divider */
+	      =  33 cycles  B - mimimum value of clock divider
+
+	   the brightness bits are now shifted out MSB to LSB, allowing a much larger
+	   'off' period in which to update the row address... */
 	clock_divider #(
 		.CLK_DIV_WIDTH(8),
-		.CLK_DIV_COUNT(40) /* see calculations above, use (D) here... */
+		.CLK_DIV_COUNT(33) /* see calculations above, use (B) here... */
 	) clkdiv_state (
 		.reset(reset),
 		.clk_in(clk_in),
@@ -148,12 +143,12 @@ module matrix_scan (
 	   too small a value causes bleed down, too large causes bleed up
 	   aim for the middle, but you might have to make the gap larger */
 	timeout #(
-		.COUNTER_WIDTH(3)
+		.COUNTER_WIDTH(5)
 	) timeout_row_address (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(~output_enable),
-		.value('d7),
+		.value('d31),
 		.counter(),
 		.running(clk_row_address)
 	);
