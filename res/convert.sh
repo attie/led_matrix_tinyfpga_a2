@@ -36,7 +36,6 @@ gst-launch-1.0 -v \
 # convert the raw frame buffer to one hex byte per-line for IPexpress
 xxd -p -c1 \
 	< "${OUTPUT_DIR}/.${OUTPUT_BASE}.bin" \
-	| sed -re 's/^(..)(..)$/\2\n\1/' \
 	> "${OUTPUT_DIR}/${OUTPUT_BASE}.mem"
 
 # convert the raw frame buffer to lines to be sent via UART
