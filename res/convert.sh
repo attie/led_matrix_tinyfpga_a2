@@ -28,7 +28,7 @@ OUTPUT_BASE="${OUTPUT_NAME%.*}"
 gst-launch-1.0 -v \
 	filesrc "location=${INPUT}" \
 	! decodebin \
-	! gamma gamma=0.6 \
+	! gamma gamma=0.4 \
 	! videoconvert dither=GST_VIDEO_DITHER_NONE \
 	! video/x-raw,format=RGB16,width=64,height=32,framerate=0/1 \
 	! filesink "location=${OUTPUT_DIR}/.${OUTPUT_BASE}.bin"
