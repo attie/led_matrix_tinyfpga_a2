@@ -18,6 +18,8 @@ INPUT="$(readlink -e "${1}")"; shift
 
 [ ! -s "${INPUT}" ] && usage "${INPUT}: file not found"
 
+[ "$(file --brief --mime-type "${INPUT}" | cut -d / -f1)" != "image" ] && usage "${INPUT}: not an image file"
+
 OUTPUT_DIR="${INPUT%/*}"
 OUTPUT_NAME="${INPUT##*/}"
 OUTPUT_BASE="${OUTPUT_NAME%.*}"
