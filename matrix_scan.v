@@ -30,10 +30,28 @@ module matrix_scan (
 	assign row_latch = clk_in && row_latch_en;
 
 	/* produces the state-advance clock
-	   states produce brighter and brighter pixels before advancing to the next row */
+	   states produce brighter and brighter pixels before advancing to the next row
+	   if this value is too small, you'll see the rows start to bleed upwards
+	   too large and the display will get dimmer and ultimately start flickering
+	   this timeout must encompass the following:
+	          1 cycle     - for clk_pixel_load_en -> clk_pixel_en delay
+	      +  64 cycles    - 1 row of pixel clocks
+	      +   1 cycle     - row latch
+		  =  66 cycles  A - total duration for one row clock-out
+
+	      +   1 cycle     - output enable delay
+	      +  32 cycles    - max brightness duration of output enable
+	      +  34 cycles    - row_address update delay (to reduce bleed)... x2 to center it
+	      = 133 cycles  B - total duration from start of state to start of next state's otuput enable
+
+	      -  66 cycles    - (A)
+	      =  67 cycles  C - minimum state clock rate
+
+	      /   2           - clock divider modules divide twice (toggle on zero)
+	      =  33 cycles  D - mimimum value of clock divider */
 	clock_divider #(
-		.CLK_DIV_WIDTH(6),
-		.CLK_DIV_COUNT(33) /* 33 * 2 = 66... each row takes 64 pixels, +1 latch = 65 clock cycles */
+		.CLK_DIV_WIDTH(8),
+		.CLK_DIV_COUNT(33) /* see calculations above, use (D) here... */
 	) clkdiv_state (
 		.reset(reset),
 		.clk_in(clk_in),
@@ -126,14 +144,16 @@ module matrix_scan (
 
 	/* produces the delayed row latch signal
 	   this signal needs to be approximately at the midpoint between output disable and enable edges
-	   if it's too close to one or another, then we get more bleed */
+	   if it's too close to one or another, then we get more bleed
+	   too small a value causes bleed down, too large causes bleed up
+	   aim for the middle, but you might have to make the gap larger */
 	timeout #(
-		.COUNTER_WIDTH(4)
+		.COUNTER_WIDTH(5)
 	) timeout_row_address (
 		.reset(reset),
 		.clk_in(clk_in),
 		.start(~output_enable),
-		.value('d15),
+		.value('d17),
 		.counter(),
 		.running(clk_row_address)
 	);
