@@ -162,13 +162,13 @@ module matrix_scan (
 	always @(posedge row_latch_en) begin
 		brightness_mask_active <= brightness_mask;
 
-		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b100000)) begin
+		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b000001)) begin
 			/* catch the initial value / oopsy */
-			brightness_mask <= 6'b1;
+			brightness_mask <= 6'b100000;
 			row_address <= row_address + 4'd1;
 		end
 		else begin
-			brightness_mask <= brightness_mask << 1;
+			brightness_mask <= brightness_mask >> 1;
 		end
 	end
 
