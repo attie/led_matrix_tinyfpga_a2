@@ -5,6 +5,13 @@
 /promote.xml
 /reportview.xml
 
+/.recovery
+/.setting.ini
+
+/generate_core.tcl
+/generate_ngd.tcl
+/msg_file.log
+
 /res/.*.bin
 /res/*.mem
 /res/*.uart
