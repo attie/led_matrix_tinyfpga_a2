@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DiamondModule name="framebuffer" module="framebuffer" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2018 09 22 19:20:38.072" version="7.5" type="Module" synthesis="lse" source_format="Verilog HDL">
+<DiamondModule name="framebuffer" module="framebuffer" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2018 09 28 13:48:03.112" version="7.5" type="Module" synthesis="lse" source_format="Verilog HDL">
   <Package>
-		<File name="" type="" modified="2018 09 22 19:20:36.017"/>
-		<File name="framebuffer.lpc" type="lpc" modified="2018 09 22 19:20:35.354"/>
-		<File name="framebuffer.v" type="top_level_verilog" modified="2018 09 22 19:20:35.443"/>
-		<File name="framebuffer_tmpl.v" type="template_verilog" modified="2018 09 22 19:20:35.452"/>
-		<File name="tb_framebuffer_tmpl.v" type="testbench_verilog" modified="2018 09 22 19:20:35.468"/>
-		<File name="z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem" type="mem" modified="2018 09 22 16:28:36.705"/>
+		<File name="" type="" modified="2018 09 28 13:48:01.140"/>
+		<File name="./res/no_signal.mem" type="mem" modified="2018 09 28 13:46:07.137"/>
+		<File name="framebuffer.lpc" type="lpc" modified="2018 09 28 13:48:00.688"/>
+		<File name="framebuffer.v" type="top_level_verilog" modified="2018 09 28 13:48:00.807"/>
+		<File name="framebuffer_tmpl.v" type="template_verilog" modified="2018 09 28 13:48:00.816"/>
+		<File name="tb_framebuffer_tmpl.v" type="testbench_verilog" modified="2018 09 28 13:48:00.868"/>
   </Package>
 </DiamondModule>

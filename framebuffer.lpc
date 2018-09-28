@@ -16,8 +16,8 @@ CoreRevision=7.5
 ModuleName=framebuffer
 SourceFormat=Verilog HDL
 ParameterFileVersion=1.0
-Date=09/22/2018
-Time=19:20:37
+Date=09/28/2018
+Time=13:48:00
 
 [Parameters]
 Verilog=1
@@ -41,7 +41,7 @@ Optimization=Speed
 Reset=Sync
 Reset1=Sync
 Init=mem
-MemFile=z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem
+MemFile=./res/no_signal.mem
 MemFormat=hex
 EnECC=0
 Pipeline=0
@@ -50,7 +50,7 @@ WriteB=Normal
 init_data=1
 
 [FilesGenerated]
-z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem=mem
+./res/no_signal.mem=mem
 
 [Command]
-cmd_line= -w -n framebuffer -lang verilog -synth lse -bus_exp 7 -bb -arch xo2c00 -type ramdp -device LCMXO2-1200HC -aaddr_width 12 -widtha 8 -baddr_width 11 -widthb 16 -anum_words 4096 -bnum_words 2048 -outdataA REGISTERED -outdataB REGISTERED -cascade -1 -resetmode SYNC -sync_reset -memfile z:/proj/led_matrix/rgb_matrix_v0.8/res/border_line_dots.mem -memformat hex -init_data DYNAMIC -writemodeA NORMAL -writemodeB NORMAL
+cmd_line= -w -n framebuffer -lang verilog -synth lse -bus_exp 7 -bb -arch xo2c00 -type ramdp -device LCMXO2-1200HC -aaddr_width 12 -widtha 8 -baddr_width 11 -widthb 16 -anum_words 4096 -bnum_words 2048 -outdataA REGISTERED -outdataB REGISTERED -cascade -1 -resetmode SYNC -sync_reset -memfile ./res/no_signal.mem -memformat hex -init_data DYNAMIC -writemodeA NORMAL -writemodeB NORMAL
