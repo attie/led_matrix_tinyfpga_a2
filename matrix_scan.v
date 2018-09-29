@@ -81,7 +81,7 @@ module matrix_scan (
 
 	/* produces the pixel clock enable signal and row_latch_state
 	   there are 64 pixels per row, this starts immediately after a state advance */
-	always @(posedge clk_in) begin
+	always @(negedge clk_in) begin
 		clk_pixel_en <= clk_pixel_load_en;
 		row_latch_state <= { row_latch_state[0], clk_pixel_load_en };
 	end
