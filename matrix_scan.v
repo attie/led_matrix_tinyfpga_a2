@@ -17,8 +17,7 @@ module matrix_scan (
 
 	wire clk_pixel_load_en;/* enables the pixel load clock */
 	reg  clk_pixel_en;    /* enables the pixel clock, delayed by one cycle from the load clock */
-	wire row_latch_delay; /* delays the row_latch timeout */
-	wire row_latch_en;    /* enables the row latch */
+	reg  [1:0] row_latch_state = 2'b0;
 
 	wire clk_row_address; /* on the falling edge, feed the row address to the active signals */
 
@@ -27,7 +26,7 @@ module matrix_scan (
 
 	assign clk_pixel_load = clk_in && clk_pixel_load_en;
 	assign clk_pixel = clk_in && clk_pixel_en;
-	assign row_latch = clk_in && row_latch_en;
+	assign row_latch = row_latch_state == 2'b10;
 
 	/* produces the state-advance clock
 	   states produce brighter and brighter pixels before advancing to the next row
@@ -80,38 +79,12 @@ module matrix_scan (
 		.running()
 	);
 
-	/* produces the pixel clock enable signal
+	/* produces the pixel clock enable signal and row_latch_state
 	   there are 64 pixels per row, this starts immediately after a state advance */
 	always @(posedge clk_in) begin
 		clk_pixel_en <= clk_pixel_load_en;
+		row_latch_state <= { row_latch_state[0], clk_pixel_load_en };
 	end
-
-	/* delays the row latch enable
-	   after 63x pixel clocks, we let the latch enable timeout run */
-	timeout #(
-		.COUNTER_WIDTH(6)
-	) timeout_row_latch_delay (
-		.reset(reset),
-		.clk_in(clk_in),
-		.start(clk_pixel_load_en),
-		.value(6'd63),
-		.counter(),
-		.running(row_latch_delay)
-	);
-
-	/* produces the row latch enable signal
-	   starts once row_latch_delay is complete
-	   start is sampled on the rising clk_in edge, thus we get a latch pulse one clock cycle after the last pixel clock */
-	timeout #(
-		.COUNTER_WIDTH(1)
-	) timeout_row_latch_en (
-		.reset(reset),
-		.clk_in(clk_in),
-		.start(~row_latch_delay),
-		.value(1'd1),
-		.counter(),
-		.running(row_latch_en)
-	);
 
 	/* decide how long to enable the LEDs for... we probably need some gamma correction here */
 	assign brightness_timeout = 
@@ -131,7 +104,7 @@ module matrix_scan (
 	) timeout_output_enable (
 		.reset(reset),
 		.clk_in(clk_in),
-		.start(~row_latch_en),
+		.start(~row_latch),
 		.value(brightness_timeout),
 		.counter(),
 		.running(output_enable)
@@ -153,8 +126,8 @@ module matrix_scan (
 		.running(clk_row_address)
 	);
 
-	/* on completion of the row_latch_delay, we advanced the brightness mask to generate the next row of pixels */
-	always @(posedge row_latch_en) begin
+	/* on completion of the row_latch, we advanced the brightness mask to generate the next row of pixels */
+	always @(posedge row_latch) begin
 		brightness_mask_active <= brightness_mask;
 
 		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b000001)) begin
