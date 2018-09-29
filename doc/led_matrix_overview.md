@@ -1,13 +1,13 @@
 # RGB LED Matrix Module Overview
 
-This project aims to run a 64 &times; 32 RGB LED matrix from a [TinyFPGA AX2](https://store.tinyfpga.com/products/tinyfpga-a2), with two full RGB565 framebuffers (double buffering).
+This project aims to run a 64 &times; 32 RGB LED matrix from a [TinyFPGA AX2](https://store.tinyfpga.com/products/tinyfpga-a2).
 
-## Get a Matrix
+## The Matrix
 
 My matrix has what looks like a model number in silk on the back: `P4-256*128-2121-A2`
 
   - `P4` - appears to be an industry standard, I _think_ this identifies the pitch
-    - In my case 4 mm between LEDs in both vertical and horizontal
+    - In my case 4 mm between LED centers, both vertical and horizontal
   - `256*128` - is the physical dimensions of the module in millimeters
     - 256 mm &divide; 4 mm = 64 pixels
     - 128 mm &divide; 4 mm = 32 pixels
@@ -17,18 +17,20 @@ My matrix has what looks like a model number in silk on the back: `P4-256*128-21
 The specific eBay listing for my module is [here](https://www.ebay.co.uk/itm/x/272157054443).
 It _**looks**_ almost identical to the Adafruit 64 &times; 32 matrix with 4mm pitch, [here](https://www.adafruit.com/product/2278).
 
-Due to the differenc modules available, and their slight changes (e.g: "_Up_" vs. "_Down_" arrows), I'll stick to talking about the module I have, rather than putting a caveat on everything.
+Due to the different modules available, and their slight changes (e.g: "_Up_" vs. "_Down_" arrows), I'll stick to talking about the module I have, rather than putting a caveat on everything.
+Remember to do the sanity checks before trying to drive a new module.
 
 ## Pinout
 
-The matrix orientation is described by "_Up_" and "_Right_" arrows.
+When viewed from behind, the matrix orientation is described by "_Up_" and "_Right_" arrows.
 There are two 16-pin connectors - data input on the left, and output on the right.
 
 The pinout is as follows:
 
 ![pinout](./rgb_led_matrix_pinout.svg)
 
-From what I've seen, some modules swap `Row[3]` for another `Ground`, and others drop the second set of RGB signals...
+From what I've seen, some modules swap `Row[3]` for another `Ground`, others swap pin 8 to a `Row[4]`, and yet others drop the second set of RGB signals...
+It's an evolving "_standard_" interface...
 
 This pinout was described by adafruit's [32x16 and 32x32 RGB LED Matrix](https://cdn-learn.adafruit.com/downloads/pdf/32x16-32x32-rgb-led-matrix.pdf) document, but I carefully confirmed it on my module.
 Sadly this document doesn't outline _anything_ about how the modules work, or what signals need to do to drive them.
@@ -37,27 +39,27 @@ Sadly this document doesn't outline _anything_ about how the modules work, or wh
 
 My matrix uses Chinese parts, the datasheets for which are of course in Chinese or absent.
 
-There are fundamentally only three components:
+There are fundamentally only three components (datasheets are [here](./datasheets/)):
 
   - `74HC245` - an octal 3-state bus tranceiver
-    - Can be configured in either direction or disabled (Hi-Z)
+    - Can be configured in either direction or disabled (Hi-Z) - but hard wired to one direction
     - There are two of these that buffer the 13&times; incoming signals
   - `TC7258EN` - a 4-to-16 line decoder
-    - The `Row[2:0]` inputs are decoded into 8&times; current sources (one output is high at a time)
+    - The `Row[2:0]` inputs are decoded into 8&times; independant current sources (only one sources current / is high at a time)
     - Up to 3A can be sourced per pin (from minimal translation of a datasheet)
-    - Pins don't sink, they go Hi-Z
+    - Pins don't sink, they go high-impedance (Hi-Z)
     - There are four of these that split the matrix into 4 row groups, of 8 rows each
     - `Row[3]` is fed into either `ENH` or `ENL` giving control over row group that is activated
   - `DP5020B` - a 16-channel LED driver
     - Appears to be a clone of TI's TLC5926
     - Should be able to sink ~32 mA per channel (~2 A per 64 pixel row)
     - There is an external resistor to allow a configurable current limit
-    - If the silk / refdes, datasheet and my interpretation of the graph are to be believed:
-      - Red &rarr; ~1 k&ohm; &rarr; ~15 mA
-      - Green &rarr; ~1.6 k&ohm; &rarr; ~8 mA
-      - Blue &rarr; ~2.35 k&ohm; &rarr; ~6 mA
-    - Data is shifted in and through a chain of 4&times;
-      - All parts share `Clock`, `#Output_Enable` and `Latch`
+      - If the silk / refdes, datasheet and my interpretation of the graph are to be believed:
+        - Red &rarr; ~1 k&ohm; &rarr; ~15 mA
+        - Green &rarr; ~1.6 k&ohm; &rarr; ~8 mA
+        - Blue &rarr; ~2.35 k&ohm; &rarr; ~6 mA
+    - Data is shifted in and through a chain of 4&times; drivers (totalling 64&times; LEDs)
+      - All parts share common `Clock`, `#Output_Enable` and `Latch`
       - A `1` will enable the current sink
       - Each chain gets one of the colors, e.g:
         - "_Input Connector_" &rarr; `UB1`.`SDI`
@@ -78,6 +80,7 @@ Each of these consist of the following:
 ### Schematic
 
 An approximate schematic of the module is shown below.
+This shows the "_top_" 8&times; rows of a sub-module... the "_bottom_" 8&times; rows will have `ENH` tied to `Row[3]` and `ENL` tied to `GND`.
 
 ![scematic](./rgb_led_matrix_schematic.svg)
 
@@ -108,14 +111,14 @@ In this simple form, you'll get 3-bit color (i.e: Black, Red, Green, Blue, Yello
 As shown below, you _must_ be careful of a few transitions:
 
   - Only assert the latch when the output is off (or you're happy for the update to be presented "_now_")
-  - Only change the `Row` when the output is off (otherwise you'll get "_glitches_", as demonstrated [here](https://www.youtube.com/watch?v=tG1vObOIVQ4))
+  - Only change the `Row[3:0]` signals when the output is off (otherwise you'll get "_glitches_", as demonstrated [here](https://www.youtube.com/watch?v=tG1vObOIVQ4))
   - It's fine to clock new data in while the output is still active
 
 ![full scan waveform](./full_scan.svg)
 
 ### Brightness Control
 
-As we aren't able to address pixels individually, and the drivers don't provide any brightness control (just on/off), we must control the output enable ourselves.
+As we aren't able to address pixels individually, and the drivers don't provide any brightness control (just on/off), we must control the brightness ourselves.
 
 The best way to do this is by displaying one bit of the sub-pixel's brightness at a time.
 
@@ -123,9 +126,9 @@ The best way to do this is by displaying one bit of the sub-pixel's brightness a
   - Vary the `#Output_Enable` width
   - Use a rolling single-bit mask, and multiple row shifts to use the correct brightness
 
-The width of `#Output_Enable` needs to be related to the current bit's value...
+The width of `#Output_Enable` needs to be related to the current bit's value... An ideal mask to "_on_" time is shown below:
 
-  - Mask of `6'b000001` has a width of 1&times;
+  - `6'b000001` &rarr; 1&times;
   - `6'b000010` &rarr; 2&times;
   - `6'b000100` &rarr; 4&times;
   - `6'b001000` &rarr; 8&times;
