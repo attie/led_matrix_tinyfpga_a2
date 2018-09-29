@@ -66,6 +66,6 @@ To keep up with this, the display must be rendered from internal memory, and can
 I've written more about the implementation of varios parts of the project on their own pages:
 
   - [RGB LED Matrix Module Overview](doc/led_matrix_overview.md)
-  - Driving the LED Matrix (_coming soon_)
+  - [Driving the LED Matrix](doc/led_matrix_driving.md)
   - UART Interface (_coming soon_)
   - Memory Storage (_coming soon_)
