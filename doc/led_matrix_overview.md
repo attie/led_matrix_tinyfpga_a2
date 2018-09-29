@@ -75,6 +75,12 @@ Each of these consist of the following:
   - 1&times; `TC7258EN` with `Vcc` &rarr; `ENH`, and `Row[3]` &rarr; `ENL` (activates only when `Row[3]` is Low)
   - 1&times; `TC7258EN` with `Row[3]` &rarr; `ENH`, and `GND` &rarr; `ENL` (activates only when `Row[3]` is High)
 
+### Schematic
+
+An approximate schematic of the module is shown below.
+
+![scematic](./rgb_led_matrix_schematic.svg)
+
 ## Operation
 
 ### One Line
