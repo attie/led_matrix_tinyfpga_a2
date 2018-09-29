@@ -26,18 +26,7 @@ There are two 16-pin connectors - data input on the left, and output on the righ
 
 The pinout is as follows:
 
-```
-                +-------+
-         Red 1  |  1  2 |  Green 1
-        Blue 1  |  3  4 |  Ground
-         Red 2  |  5  6 |  Green 2
-        Blue 2     7  8 |  Ground
-        Row[0]     9 10 |  Row[1]
-        Row[2]  | 11 12 |  Row[3]
-         Clock  | 13 14 |  Latch
-#Output_Enable  | 15 16 |  Ground
-                +-------+
-```
+![pinout](rgb_led_matrix_pinout.png)
 
 From what I've seen, some modules swap `Row[3]` for another `Ground`, and others drop the second set of RGB signals...
 
