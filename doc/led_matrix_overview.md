@@ -26,7 +26,7 @@ There are two 16-pin connectors - data input on the left, and output on the righ
 
 The pinout is as follows:
 
-![pinout](rgb_led_matrix_pinout.png)
+![pinout](./rgb_led_matrix_pinout.svg)
 
 From what I've seen, some modules swap `Row[3]` for another `Ground`, and others drop the second set of RGB signals...
 
@@ -86,7 +86,7 @@ To drive the matrix, you need to:
   3. Address a row (0 - 15)
   4. Enable the output
 
-![row shift waveform](row_shift.svg)
+![row shift waveform](./row_shift.svg)
 
 This will let you display 6 colors on a single row of the matrix (well... two rows, due to the two stacked sub-modules)
 
@@ -105,7 +105,7 @@ As shown below, you _must_ be careful of a few transitions:
   - Only change the `Row` when the output is off (otherwise you'll get "_glitches_", as demonstrated [here](https://www.youtube.com/watch?v=tG1vObOIVQ4))
   - It's fine to clock new data in while the output is still active
 
-![full scan waveform](full_scan.svg)
+![full scan waveform](./full_scan.svg)
 
 ### Brightness Control
 
@@ -131,6 +131,6 @@ For low values the brightness rapidly increases, while for high values the brigh
 To address this, we can apply [Gamma correction](https://en.wikipedia.org/wiki/Gamma_correction).
 I'm wondering if we can do something about that here, with the variable width control of `#Output_Enable`... but brief attempts and mental reasoning are hinting at "_no_"... any thoughts? :-)
 
-![brightness waveform](brightness.svg)
+![brightness waveform](./brightness.svg)
 
 To reduce off-time (i.e: make the display brighter), you can start clocking the next bit out during the on-time of the previous bit.
