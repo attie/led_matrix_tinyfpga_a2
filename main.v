@@ -81,8 +81,8 @@ module main (
 
 	/* produce a clock for use on the LED matrix */
 	clock_divider #(
-		.CLK_DIV_WIDTH(6),
-		.CLK_DIV_COUNT(24)
+		.CLK_DIV_WIDTH(2),
+		.CLK_DIV_COUNT(3)
 	) clkdiv_matrix (
 		.reset(global_reset),
 		.clk_in(clk_root),

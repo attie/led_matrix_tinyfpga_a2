@@ -13,7 +13,7 @@ module matrix_scan (
 
 	output reg [5:0] brightness_mask /* used to pick a bit from the sub-pixel's brightness */
 );
-	localparam state_timeout_overlap = 'd66;
+	localparam state_timeout_overlap = 'd67;
 
 	reg [1:0] state = 2'b00;
 	wire clk_state;
@@ -71,19 +71,19 @@ module matrix_scan (
 
 	/* decide how long to enable the LEDs for... we probably need some gamma correction here */
 	assign brightness_timeout = 
-		(brightness_mask_active == 6'b000001) ? 8'd2 :
-		(brightness_mask_active == 6'b000010) ? 8'd4 :
-		(brightness_mask_active == 6'b000100) ? 8'd8 :
-		(brightness_mask_active == 6'b001000) ? 8'd16 :
-		(brightness_mask_active == 6'b010000) ? 8'd32 :
-		(brightness_mask_active == 6'b100000) ? 8'd64 :
-		8'd0;
+		(brightness_mask_active == 6'b000001) ? 10'd23 :
+		(brightness_mask_active == 6'b000010) ? 10'd46 :
+		(brightness_mask_active == 6'b000100) ? 10'd92 :
+		(brightness_mask_active == 6'b001000) ? 10'd184 :
+		(brightness_mask_active == 6'b010000) ? 10'd368 :
+		(brightness_mask_active == 6'b100000) ? 10'd736 :
+		10'd1;
 
 	/* produces the variable-width output enable signal
 	   this signal is controlled by the rolling brightness_mask_active signal (brightness_mask has advanced already)
 	   the wider the output_enable pulse, the brighter the LEDs */
 	timeout #(
-		.COUNTER_WIDTH(8)
+		.COUNTER_WIDTH(10)
 	) timeout_output_enable (
 		.reset(reset),
 		.clk_in(clk_in),
