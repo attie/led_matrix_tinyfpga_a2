@@ -127,17 +127,25 @@ module matrix_scan (
 	);
 
 	/* on completion of the row_latch, we advanced the brightness mask to generate the next row of pixels */
-	always @(posedge row_latch) begin
-		brightness_mask_active <= brightness_mask;
-		row_address_active <= row_address;
-
-		if ((brightness_mask == 6'd0) || (brightness_mask == 6'b000001)) begin
-			/* catch the initial value / oopsy */
-			brightness_mask <= 6'b100000;
-			row_address <= row_address + 4'd1;
+	always @(posedge row_latch, posedge reset) begin
+		if (reset) begin
+			brightness_mask <= 6'd0;
+			brightness_mask_active <= 6'd0;
+			row_address <= 4'd0;
+			row_address_active <= 4'd0;
 		end
 		else begin
-			brightness_mask <= brightness_mask >> 1;
+			brightness_mask_active <= brightness_mask;
+			row_address_active <= row_address;
+
+			if ((brightness_mask == 6'd0) || (brightness_mask == 6'b000001)) begin
+				/* catch the initial value / oopsy */
+				brightness_mask <= 6'b100000;
+				row_address <= row_address + 4'd1;
+			end
+			else begin
+				brightness_mask <= brightness_mask >> 1;
+			end
 		end
 	end
 endmodule
