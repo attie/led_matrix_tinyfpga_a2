@@ -13,6 +13,7 @@ module control_module #(
 	output rx_running,
 
 	output reg [2:0] rgb_enable = 3'b111,
+	output reg [5:0] brightness_enable = 6'b111111,
 
 	input [7:0] ram_data_in,
 	output reg [7:0] ram_data_out,
@@ -71,6 +72,7 @@ module control_module #(
 	always @(negedge uart_rx_running, posedge reset) begin
 		if (reset) begin
 			rgb_enable <= 3'b111;
+			brightness_enable <= 6'b111111;
 
 			ram_data_out <= 8'd0;
 			ram_address <= 12'd0;
@@ -117,6 +119,17 @@ module control_module #(
 				"g": rgb_enable[1] <= 1'b0;
 				"B": rgb_enable[2] <= 1'b1;
 				"b": rgb_enable[2] <= 1'b0;
+
+				"1": brightness_enable[5] <= ~brightness_enable[5];
+				"2": brightness_enable[4] <= ~brightness_enable[4];
+				"3": brightness_enable[3] <= ~brightness_enable[3];
+				"4": brightness_enable[2] <= ~brightness_enable[2];
+				"5": brightness_enable[1] <= ~brightness_enable[1];
+				"6": brightness_enable[0] <= ~brightness_enable[0];
+
+				"0": brightness_enable <= 6'b000000;
+				"9": brightness_enable <= 6'b111111;
+
 				"L": cmd_line_state <= 2'd2;
 			endcase
 		end

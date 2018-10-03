@@ -53,6 +53,7 @@ module main (
 	wire [5:0] brightness_mask;
 
 	wire [2:0] rgb_enable;
+	wire [5:0] brightness_enable;
 	wire [2:0] rgb1; /* the current RGB value for the top-half of the display */
 	wire [2:0] rgb2; /* the current RGB value for the bottom-half of the display */
 
@@ -129,6 +130,7 @@ module main (
 		.rx_running(rx_running),
 
 		.rgb_enable(rgb_enable),
+		.brightness_enable(brightness_enable),
 
 		.ram_data_in(ram_a_data_out),
 		.ram_data_out(ram_a_data_in),
@@ -162,13 +164,13 @@ module main (
 	/* split the pixels and get the current brightness' bit */
 	pixel_split px_top (
 		.pixel_rgb565(pixel_rgb565_top),
-		.brightness_mask(brightness_mask),
+		.brightness_mask(brightness_mask & brightness_enable),
 		.rgb_enable(rgb_enable),
 		.rgb_output(rgb1)
 	);
 	pixel_split px_bottom (
 		.pixel_rgb565(pixel_rgb565_bottom),
-		.brightness_mask(brightness_mask),
+		.brightness_mask(brightness_mask & brightness_enable),
 		.rgb_enable(rgb_enable),
 		.rgb_output(rgb2)
 	);
