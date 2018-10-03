@@ -13,7 +13,11 @@ module matrix_scan (
 
 	output reg [5:0] brightness_mask /* used to pick a bit from the sub-pixel's brightness */
 );
+	localparam state_timeout_overlap = 'd66;
+
+	reg [1:0] state = 2'b00;
 	wire clk_state;
+	wire state_advance;
 
 	wire clk_pixel_load_en;/* enables the pixel load clock */
 	reg  clk_pixel_en;    /* enables the pixel clock, delayed by one cycle from the load clock */
@@ -22,35 +26,14 @@ module matrix_scan (
 	wire clk_row_address; /* on the falling edge, feed the row address to the active signals */
 
 	reg  [5:0] brightness_mask_active; /* the active mask value (LEDs enabled)... from before the state advanced */
-	wire [7:0] brightness_timeout;     /* used to time the output enable period */
+	wire [9:0] brightness_timeout;     /* used to time the output enable period */
+	wire [9:0] brightness_counter;     /* used to control the state advance overlap */
 
 	assign clk_pixel_load = clk_in && clk_pixel_load_en;
 	assign clk_pixel = clk_in && clk_pixel_en;
 	assign row_latch = row_latch_state[1:0] == 2'b10;
 
-	/* produces the state-advance clock
-	   states produce brighter and brighter pixels before advancing to the next row
-	   if this value is too small, you'll see the rows start to bleed upwards
-	   too large and the display will get dimmer and ultimately start flickering
-	   this timeout must encompass the following:
-	          1 cycle     - for clk_pixel_load_en -> clk_pixel_en delay
-	      +  64 cycles    - 1 row of pixel clocks
-	      +   1 cycle     - row latch
-		  =  66 cycles  A - total duration for one row clock-out
-
-	      /   2           - clock divider modules divide twice (toggle on zero)
-	      =  33 cycles  B - mimimum value of clock divider
-
-	   the brightness bits are now shifted out MSB to LSB, allowing a much larger
-	   'off' period in which to update the row address... */
-	clock_divider #(
-		.CLK_DIV_WIDTH(8),
-		.CLK_DIV_COUNT(33) /* see calculations above, use (B) here... */
-	) clkdiv_state (
-		.reset(reset),
-		.clk_in(clk_in),
-		.clk_out(clk_state)
-	);
+	assign clk_state = state == 2'b10;
 
 	/* produce 64 load clocks per line...
 	   external logic should present the pixel value on the rising edge */
@@ -106,25 +89,23 @@ module matrix_scan (
 		.clk_in(clk_in),
 		.start(~row_latch),
 		.value(brightness_timeout),
-		.counter(),
+		.counter(brightness_counter),
 		.running(output_enable)
 	);
 
-	/* produces the delayed row latch signal
-	   this signal needs to be approximately at the midpoint between output disable and enable edges
-	   if it's too close to one or another, then we get more bleed
-	   too small a value causes bleed down, too large causes bleed up
-	   aim for the middle, but you might have to make the gap larger */
-	timeout #(
-		.COUNTER_WIDTH(5)
-	) timeout_row_address (
-		.reset(reset),
-		.clk_in(clk_in),
-		.start(~output_enable),
-		.value('d31),
-		.counter(),
-		.running(clk_row_address)
-	);
+	/* we want to overlap the pixel clock out with the previous output
+	   enable... but we do not want to start too early... */
+	assign state_advance = !output_enable || (state_timeout_overlap < brightness_counter);
+
+	/* shift the state advance signal into the bitfield */
+	always @(posedge clk_in, posedge reset) begin
+		if (reset) begin
+			state <= 2'b1;
+		end
+		else begin
+			state <= { state[0], state_advance };
+		end
+	end
 
 	/* on completion of the row_latch, we advanced the brightness mask to generate the next row of pixels */
 	always @(posedge row_latch, posedge reset) begin
