@@ -14,9 +14,7 @@ This project aims to run a 64 &times; 32 RGB LED matrix from a [TinyFPGA AX2](ht
 Due to memory constraints, I'm aiming to have a 16-bit framebuffer.
 Each pixel will require 2 bytes, and the layout will be as follows:
 
-```
-R4 R3 R2 R1  R0 G5 G4 G3    G2 G1 G0 B4  B3 B2 B1 B0
-```
+![rgb565_layout](./doc/rgb565_layout.svg)
 
 To display this correctly, I'll need to be able to control the brightness of each LED with a range of at least 6-bits.
 
@@ -68,4 +66,5 @@ I've written more about the implementation of varios parts of the project on the
   - [RGB LED Matrix Module Overview](doc/led_matrix_overview.md)
   - [Driving the LED Matrix](doc/led_matrix_driving.md)
   - [UART Interface](doc/uart_rx.md)
+  - [Control Module](doc/control_module.md)
   - Memory Storage (_coming soon_)
