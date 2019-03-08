@@ -1,7 +1,7 @@
 /* UART is typically 1 start bit, 8 data bits (LSB first), no parity, 1 stop bit
        start, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], stop */
 module uart_rx #(
-	parameter CLK_DIV_COUNT = 30, /* 7 MHz in / 30 = ~115,200 baud (actually ~116,686 baud, +1.29%) */
+	parameter CLK_DIV_COUNT = 30, /* 7 MHz in / ( 30 * 2 ) = ~115,200 baud (actually ~116,686 baud, +1.29%) */
 	parameter CLK_DIV_WIDTH = 5,
 	
 	parameter DATA_COUNT = 8,
@@ -31,8 +31,10 @@ module uart_rx #(
 	/* start the timeout when rx_line is low AND we're not running */
 	wire timeout_word_start = !rx_line && !rx_running;
 
-	/* produce a clock that runs at 2x the baudrate
-	   this module has to be here so that the divided clock can run in phase with the symbols */
+	/* produce a clock that runs at the desired baudrate
+	   clk_out = clk_in / ( CLK_DIV_COUNT * 2 )
+	   this module has to be here so that the divided clock can run in phase with the symbols
+	   immediately after reset, clk_baudrate is low */
 	clock_divider #(
 		.CLK_DIV_COUNT(CLK_DIV_COUNT),
 		.CLK_DIV_WIDTH(CLK_DIV_WIDTH)
