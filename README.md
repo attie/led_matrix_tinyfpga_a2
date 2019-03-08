@@ -67,5 +67,5 @@ I've written more about the implementation of varios parts of the project on the
 
   - [RGB LED Matrix Module Overview](doc/led_matrix_overview.md)
   - [Driving the LED Matrix](doc/led_matrix_driving.md)
-  - UART Interface (_coming soon_)
+  - [UART Interface](doc/uart_rx.md)
   - Memory Storage (_coming soon_)
