@@ -1,7 +1,9 @@
 /* simple clock divider
    counts from zero to the given value, and then toggles clk_out
 	 counts on positive edge of clk_in
-	 reset is active-high */
+	 reset is active-high
+   because the output toggles at match, the frequency of clk_out is
+     clk_in / ( CLK_DIV_COUNT * 2 ) */
 module clock_divider #(
 	parameter CLK_DIV_WIDTH = 8,
 	parameter CLK_DIV_COUNT = 0
