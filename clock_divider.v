@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 /* simple clock divider
    counts from zero to the given value, and then toggles clk_out
 	 counts on positive edge of clk_in

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 module rainbow_generator (
 	input [5:0] column_address,
 

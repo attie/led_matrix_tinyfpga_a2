@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 module control_module #(
 	/* UART configuration */
 	//parameter UART_CLK_DIV_COUNT = 30, /* 7 MHz in / 60 = ~115,200 baud (actually ~116,686 baud, +1.29%) */

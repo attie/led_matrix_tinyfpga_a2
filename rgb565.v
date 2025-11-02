@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 module rgb565 (
 	input [15:0] rgb565,
 

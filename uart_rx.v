@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 /* UART is typically 1 start bit, 8 data bits (LSB first), no parity, 1 stop bit
        start, d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], stop */
 module uart_rx #(

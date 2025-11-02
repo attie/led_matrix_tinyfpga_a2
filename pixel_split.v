@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 module pixel_split (
 	input [15:0] pixel_rgb565,
 	input [5:0] brightness_mask,

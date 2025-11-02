@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2025 Attie Grande <attie@attie.co.uk>
+
 module brightness (
 	input [5:0] value, /* the pixel's absolute value */
 	input [5:0] mask,  /* a rolling brightness mask */
